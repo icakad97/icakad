@@ -1,95 +1,58 @@
-"""Utilities for base-n style short URL tokens."""
+# This is icakad.shorturl
+# Usage: from icakad import shorturl
+import requests
 
-from __future__ import annotations
+DEBUG = False
+BASE = "https://linkove.icu"
+HEADERS = {"Content-Type": "application/json","Authorization": f"Bearer {__all__['TOKEN']}"}
 
-from dataclasses import dataclass
-from typing import Dict, Optional
+# === 1. Добавяне на нов линк ===
+def add_link(slug, url):
+    data = {"slug": slug, "url": url}
+    r = requests.post(f"{BASE}/api", json=data, headers=HEADERS)
+    if DEBUG:
+        print("ADD:", r.status_code, r.json())
+    return r.json()
 
-DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# === 2. Редактиране (същото като добавяне – презаписва) ===
+def edit_link(slug, new_url):
+    data = {"slug": slug, "url": new_url}
+    r = requests.post(f"{BASE}/api/{slug}", json=data, headers=HEADERS)
+    if DEBUG:
+        print("EDIT:", r.status_code, r.json())
+    return r.json()
 
+# === 3. Изтриване ===
+def delete_link(slug):
+    r = requests.delete(f"{BASE}/api/{slug}", headers=HEADERS)
+    if DEBUG:
+        print("DELETE:", r.status_code, r.json())
+    return r.json()
 
-@dataclass(frozen=True)
-class ShortURLConfig:
-    """Configuration for ``ShortURL`` codecs."""
+# === 4. Листване на всички ===
+def list_links():
+    r = requests.get(f"{BASE}/api", headers=HEADERS)
+    try:
+        data = r.json()
+    except ValueError:
+        return {}
 
-    alphabet: str = DEFAULT_ALPHABET
-    min_length: int = 1
+    # Може да е {"items":[...]} или директен списък
+    if isinstance(data, dict):
+        items = data.get("items", data.get("list", []))
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
 
-    def __post_init__(self) -> None:
-        if not self.alphabet:
-            raise ValueError("alphabet must contain at least one character")
-        if len(set(self.alphabet)) != len(self.alphabet):
-            raise ValueError("alphabet characters must be unique")
-        if self.min_length < 1:
-            raise ValueError("min_length must be >= 1")
+    links = {}
+    for it in items:
+        slug = it.get("key") or it.get("slug") or it.get("id") or it.get("name")
+        url = it.get("url") or it.get("value")
+        if slug and url:
+            links[slug] = url
 
+    if DEBUG:
+        print(json.dumps(links, indent=2, ensure_ascii=False))
 
-class ShortURL:
-    """Encode and decode integers into short, URL-friendly tokens."""
-
-    def __init__(self, config: Optional[ShortURLConfig] = None) -> None:
-        self.config = config or ShortURLConfig()
-        self._base = len(self.config.alphabet)
-        self._index: Dict[str, int] = {
-            char: position for position, char in enumerate(self.config.alphabet)
-        }
-
-    def encode(self, number: int) -> str:
-        """Convert a non-negative integer into a short token."""
-        if number < 0:
-            raise ValueError("number must be non-negative")
-
-        if number == 0:
-            token = self.config.alphabet[0]
-        else:
-            digits = []
-            value = number
-            while value:
-                value, remainder = divmod(value, self._base)
-                digits.append(self.config.alphabet[remainder])
-            digits.reverse()
-            token = "".join(digits)
-
-        if len(token) < self.config.min_length:
-            padding = self.config.alphabet[0] * (self.config.min_length - len(token))
-            token = f"{padding}{token}"
-
-        return token
-
-    def decode(self, token: str) -> int:
-        """Convert a short token back into the original integer."""
-        if not token:
-            raise ValueError("token must not be empty")
-
-        value = 0
-        for char in token:
-            try:
-                value = value * self._base + self._index[char]
-            except KeyError as exc:
-                raise ValueError(f"token contains invalid character: {char!r}") from exc
-
-        return value
-
-
-_DEFAULT_CODEC = ShortURL()
-
-
-def encode(number: int, *, config: Optional[ShortURLConfig] = None) -> str:
-    """Encode ``number`` using the default or a custom configuration."""
-    codec = _DEFAULT_CODEC if config is None else ShortURL(config)
-    return codec.encode(number)
-
-
-def decode(token: str, *, config: Optional[ShortURLConfig] = None) -> int:
-    """Decode ``token`` using the default or a custom configuration."""
-    codec = _DEFAULT_CODEC if config is None else ShortURL(config)
-    return codec.decode(token)
-
-
-__all__ = [
-    "ShortURL",
-    "ShortURLConfig",
-    "DEFAULT_ALPHABET",
-    "encode",
-    "decode",
-]
+    return links

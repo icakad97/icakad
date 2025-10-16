@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: icakad
-Version: 0.1.0
+Version: 0.1.1
 Summary: Utilities and tools for my apis and other life hacks.
 Author: icakad
 License: MIT License
@@ -26,8 +26,8 @@ License: MIT License
         SOFTWARE.
         
 Project-URL: Homepage, https://linkove.icu/
-Project-URL: Repository, https://xp87.icu/repository/icakad
-Keywords: icakad,shorturl,url-shortener,encoding
+Project-URL: Repository, https://github.com/icakad97/icakad
+Keywords: icakad,shorturl,url-shortener
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.8

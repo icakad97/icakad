@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from .shorturl import DEFAULT_ALPHABET, ShortURL, ShortURLConfig, decode, encode
+from .shorturl import add_link, edit_link, delete_link, list_links
 
 __all__ = [
-    "ShortURL",
-    "ShortURLConfig",
-    "DEFAULT_ALPHABET",
-    "encode",
-    "decode",
+    "TOKEN"='icakadTOKEN',
+    "add_link",
+    "edit_link",
+    "delete_link",
+    "list_links",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
