@@ -1,0 +1,9 @@
+LICENSE
+README.md
+pyproject.toml
+src/icakad/__init__.py
+src/icakad/shorturl.py
+src/icakad.egg-info/PKG-INFO
+src/icakad.egg-info/SOURCES.txt
+src/icakad.egg-info/dependency_links.txt
+src/icakad.egg-info/top_level.txt
