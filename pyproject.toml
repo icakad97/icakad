@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "icakad"
-version = "0.1.2"
+version = "0.1.3"
 description = "Utilities and tools for my apis and other life hacks."
 readme = "README.md"
 requires-python = ">=3.8"
