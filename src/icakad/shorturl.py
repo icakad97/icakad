@@ -1,58 +1,45 @@
-# This is icakad.shorturl
-# Usage: from icakad import shorturl
-import requests
+"""Съвместим слой за работа с услугата за кратки линкове."""
 
-DEBUG = False
-BASE = "https://linkove.icu"
-HEADERS = {"Content-Type": "application/json","Authorization": f"Bearer {__all__['TOKEN']}"}
+from __future__ import annotations
 
-# === 1. Добавяне на нов линк ===
-def add_link(slug, url):
-    data = {"slug": slug, "url": url}
-    r = requests.post(f"{BASE}/api", json=data, headers=HEADERS)
-    if DEBUG:
-        print("ADD:", r.status_code, r.json())
-    return r.json()
+from typing import Any, Dict, Mapping, Optional
 
-# === 2. Редактиране (същото като добавяне – презаписва) ===
-def edit_link(slug, new_url):
-    data = {"slug": slug, "url": new_url}
-    r = requests.post(f"{BASE}/api/{slug}", json=data, headers=HEADERS)
-    if DEBUG:
-        print("EDIT:", r.status_code, r.json())
-    return r.json()
+from .api import ShortURLClient, normalise_shorturl_listing
+from . import get_shorturl_client
 
-# === 3. Изтриване ===
-def delete_link(slug):
-    r = requests.delete(f"{BASE}/api/{slug}", headers=HEADERS)
-    if DEBUG:
-        print("DELETE:", r.status_code, r.json())
-    return r.json()
+__all__ = [
+    "ShortURLClient",
+    "add_link",
+    "edit_link",
+    "delete_link",
+    "list_links",
+]
 
-# === 4. Листване на всички ===
-def list_links():
-    r = requests.get(f"{BASE}/api", headers=HEADERS)
-    try:
-        data = r.json()
-    except ValueError:
-        return {}
 
-    # Може да е {"items":[...]} или директен списък
-    if isinstance(data, dict):
-        items = data.get("items", data.get("list", []))
-    elif isinstance(data, list):
-        items = data
-    else:
-        items = []
+def _client(client: Optional[ShortURLClient]) -> ShortURLClient:
+    return client if client is not None else get_shorturl_client()
 
-    links = {}
-    for it in items:
-        slug = it.get("key") or it.get("slug") or it.get("id") or it.get("name")
-        url = it.get("url") or it.get("value")
-        if slug and url:
-            links[slug] = url
 
-    if DEBUG:
-        print(json.dumps(links, indent=2, ensure_ascii=False))
+def add_link(slug: str, url: str, *, client: Optional[ShortURLClient] = None) -> Mapping[str, Any]:
+    """Създава или подменя slug."""
 
-    return links
+    return _client(client).create(slug=slug, url=url)
+
+
+def edit_link(slug: str, new_url: str, *, client: Optional[ShortURLClient] = None) -> Mapping[str, Any]:
+    """Актуализира slug."""
+
+    return _client(client).update(slug=slug, url=new_url)
+
+
+def delete_link(slug: str, *, client: Optional[ShortURLClient] = None) -> Mapping[str, Any]:
+    """Изтрива slug."""
+
+    return _client(client).delete(slug=slug)
+
+
+def list_links(*, client: Optional[ShortURLClient] = None) -> Dict[str, str]:
+    """Връща всички slug-ове като речник."""
+
+    payload = _client(client).list()
+    return normalise_shorturl_listing(payload)

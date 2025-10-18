@@ -4,10 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "icakad"
-version = "0.1.1"
+version = "0.2.0"
 description = "Utilities and tools for my apis and other life hacks."
 readme = "README.md"
 requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31",
+]
 license = { file = "LICENSE" }
 authors = [{ name = "icakad" }]
 keywords = ['icakad', "shorturl", "url-shortener"]
@@ -26,6 +29,9 @@ classifiers = [
 [project.urls]
 Homepage = "https://linkove.icu/"
 Repository = "https://github.com/icakad97/icakad"
+
+[project.scripts]
+icakad = "icakad.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

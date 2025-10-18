@@ -1,13 +1,9 @@
 # icakad
 
-Lightweight Python client for managing short links hosted on the [linkove.icu](https://linkove.icu) worker.  
-The package exports a small set of helpers that wrap the service API so automations and scripts can add, edit, delete, or list slugs without hand-crafting HTTP requests.
-
-## Highlights
-
-- Minimal footprint: only depends on `requests`
-- Module-level configuration for base URL, bearer token, and debug logging
-- Uniform response handling that normalises the `list` endpoint payload
+Powerful-yet-lightweight toolkit and CLI for working with the icakad services. The
+package ships batteries included: a reusable HTTP client layer, helpers dedicated
+for the short URL worker, a minimal paste-bin client, and a production-ready
+command line interface that ties everything together.
 
 ## Installation
 
@@ -15,79 +11,94 @@ The package exports a small set of helpers that wrap the service API so automati
 pip install icakad
 ```
 
-Install `requests` separately if it is not already available in your environment.
-
-## Quick Start
-
-```python
-from icakad import add_link, edit_link, delete_link, list_links
-from icakad import shorturl
-
-# Configure credentials and optional debugging up front
-shorturl.HEADERS["Authorization"] = "Bearer <your-token>"
-shorturl.DEBUG = False
-
-# Create or overwrite a slug
-add_link(slug="docs", url="https://example.com/docs")
-
-# Update an existing slug
-edit_link(slug="docs", new_url="https://example.com/documentation")
-
-# Fetch the full catalogue
-links = list_links()
-print(links.get("docs"))
-
-# Remove a slug
-delete_link(slug="docs")
-```
-
-Each helper returns the JSON body produced by the worker. Inspect it for status codes, error messages, or additional metadata.
-
-## API Reference
-
-All helpers live in `icakad.shorturl` and are re-exported at the package root for convenience.
-
-| Function | Description |
-| --- | --- |
-| `add_link(slug: str, url: str) -> dict` | Create or overwrite a slug with the target URL. |
-| `edit_link(slug: str, new_url: str) -> dict` | Update an existing slug. Backed by `POST /api/<slug>`. |
-| `delete_link(slug: str) -> dict` | Delete the slug via `DELETE /api/<slug>`. |
-| `list_links() -> dict[str, str]` | Retrieve all slugs. Normalises both list-style and `{"items": [...]}` payloads. |
+The package depends on [`requests`](https://docs.python-requests.org/) which will
+be pulled automatically when installing from PyPI.
 
 ## Configuration
 
-Tweak behaviour by adjusting attributes on `icakad.shorturl`:
+Authentication relies on bearer tokens. The CLI and the Python helpers both read
+configuration from environment variables which keeps secrets outside of scripts:
 
-- `BASE`: API root (default `https://linkove.icu`). Point this elsewhere for staging or local testing.
-- `HEADERS`: Dictionary of headers supplied with every request. Set the bearer token here.
-- `DEBUG`: When `True`, prints HTTP status codes and JSON responses to stdout.
+| Variable | Description | Default |
+| --- | --- | --- |
+| `ICAKAD_TOKEN` | Token shared by all services. | _unset_ |
+| `ICAKAD_SHORTURL_BASE` | Base URL for the short link API. | `https://linkove.icu/api` |
+| `ICAKAD_PASTE_BASE` | Base URL for the paste API. | `https://paste.icakad.com/api` |
 
-Feel free to override the module-level `requests` usage with your own session or retry logic by wrapping these helpers.
+You can override the defaults on a per-call basis by passing the `token` or
+`base_url` parameters when constructing the dedicated clients.
 
-## Error Handling Tips
+## Command Line Usage
 
-- Wrap calls in `try/except requests.RequestException` for transport-level issues.
-- Validate mandatory keys in the returned JSON before relying on them.
-- Enable `DEBUG` when tuning your worker or troubleshooting authentication.
+The package installs the `icakad` executable. Run `icakad --help` to explore all
+commands. Highlights:
+
+```bash
+# Create or replace a short link
+icakad shorturl add docs https://example.com/docs
+
+# Update an existing slug
+icakad shorturl edit docs https://example.com/documentation
+
+# Print every slug in a compact table or as JSON
+icakad shorturl list
+icakad shorturl list --json
+
+# Create a paste (reads from stdin when the content argument is omitted or set to '-')
+printf 'hello world' | icakad paste create - --title demo
+
+# Fetch or delete an existing paste
+icakad paste show abc123
+icakad paste delete abc123
+```
+
+Use `--token`, `--shorturl-base`, and `--paste-base` to override the defaults
+without touching environment variables. The `--debug` flag prints the HTTP
+status code for every request, which is handy when troubleshooting.
+
+## Python API
+
+The high-level helpers mirror the legacy interface but are now powered by the
+new client layer:
+
+```python
+from icakad import add_link, edit_link, delete_link, list_links
+
+add_link("docs", "https://example.com/docs")
+edit_link("docs", "https://example.com/documentation")
+all_links = list_links()
+print(all_links["docs"])
+delete_link("docs")
+```
+
+For advanced scenarios instantiate the clients directly:
+
+```python
+from icakad import get_shorturl_client, get_paste_client
+
+short_client = get_shorturl_client(token="...custom...")
+short_client.create(slug="demo", url="https://example.com")
+
+paste_client = get_paste_client()
+created = paste_client.create(content="Hello from icakad")
+print(created)
+```
+
+The clients raise `icakad.APIError` with the HTTP status code and decoded JSON
+payload whenever a request fails.
 
 ## Development
 
-Clone the repository and install it in editable mode:
-
 ```bash
+# Install locally
 pip install -e .
-```
 
-Build packages:
+# Run a quick syntax check
+python -m compileall src
 
-```bash
+# Build the wheel and sdist artefacts
 python -m build
 ```
 
-Run any tests or scripts you add:
-
-```bash
-python -m pytest
-```
-
-Contributions that improve ergonomics (e.g., async helpers, richer error handling) are welcome.
+Contributions are welcome! Feel free to open pull requests with new commands or
+integrations with other icakad services.
