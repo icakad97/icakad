@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "icakad"
-version = "0.1.1"
+version = "0.1.2"
 description = "Utilities and tools for my apis and other life hacks."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { file = "LICENSE" }
 authors = [{ name = "icakad" }]
-keywords = ['icakad', "shorturl", "url-shortener"]
+keywords = ['icakad']
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
