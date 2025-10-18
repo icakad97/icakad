@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Configuration · icakad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Configuration</h1>
+    <p>Fine-tune defaults for the icakad toolkit so every command uses the right endpoints and credentials.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Config File</h2>
+      <p>Place a JSON file at <code>~/.config/icakad/config.json</code> or pass <code>--config path</code>.</p>
+      <pre><code>{
+  "shorturl_base": "https://linkove.icu",
+  "paste_base": "https://linkove.icu",
+  "token": "your-secret-token"
+}
+</code></pre>
+      <p>Any field can be omitted; missing values fall back to defaults.</p>
+    </section>
+    <section>
+      <h2>Environment Variables</h2>
+      <ul class="checklist">
+        <li><code>ICAKAD_CONFIG</code> &mdash; custom config path.</li>
+        <li><code>ICAKAD_TOKEN</code> &mdash; bearer token for both services.</li>
+        <li><code>ICAKAD_SHORTURL_BASE</code> / <code>ICAKAD_PASTE_BASE</code> &mdash; override endpoints dynamically.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Programmatic Use</h2>
+      <pre><code>from icakad import load_settings, list_short_links
+
+settings = load_settings(token="demo-token")
+links = list_short_links(token=settings.token, base_url=settings.shorturl_base)
+</code></pre>
+      <p>Combine settings with <code>save_to</code> to generate reports automatically:</p>
+      <pre><code>list_short_links(save_to="links.json")
+fetch_paste("release-notes", raw=True, save_to="notes.txt")
+</code></pre>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>

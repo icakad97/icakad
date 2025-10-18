@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>icakad Toolkit · Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>icakad Toolkit</h1>
+    <p>Unified helpers for icakad services running on <strong>xp97.icu</strong>, <strong>linkove.icu</strong>, and the @icakad GitHub projects. Build short links, share pastes, and automate workflows without digging through code.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Quick Start</h2>
+      <p>Install the public package from PyPI and explore the live services.</p>
+      <pre><code>python -m pip install icakad
+python -m icakad --help</code></pre>
+      <p>If you run <code>python -m icakad</code> without arguments the tool opens this documentation for you.</p>
+      <a class="button" href="cli.html">See available commands</a>
+    </section>
+    <section>
+      <h2>What&rsquo;s Included</h2>
+      <ul>
+        <li><strong>Short URL client</strong> for the @shorturl worker on <code>linkove.icu/api</code>.</li>
+        <li><strong>Pastebin client</strong> layered on top of the @paste worker.</li>
+        <li><strong>Config loader</strong> that understands JSON files, environment variables, and CLI overrides.</li>
+        <li><strong>File-friendly helpers</strong> so non-developers can write outputs to disk or read pastes from text files.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Repositories</h2>
+      <p>All projects sync through GitHub:</p>
+      <ul>
+        <li><code>@icakad</code> &mdash; PyPI client (this repository).</li>
+        <li><code>@shorturl</code> &mdash; Cloudflare worker powering short links.</li>
+        <li><code>@paste</code> &mdash; Cloudflare worker for pastes and text shares.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Next Steps</h2>
+      <p>Jump into the dedicated guides to learn how to automate link creation, build shareable pastes, and tailor the toolkit to your environment.</p>
+      <ul>
+        <li><a href="shorturl.html">Manage short links in a few commands.</a></li>
+        <li><a href="paste.html">Store text snippets safely.</a></li>
+        <li><a href="config.html">Save your defaults in a config file.</a></li>
+      </ul>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>

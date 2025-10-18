@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Command Line · icakad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Command Line Reference</h1>
+    <p>The <code>python -m icakad</code> entry point provides a friendly CLI for non-developers.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Global Flags</h2>
+      <ul class="checklist">
+        <li><code>--config &lt;path&gt;</code> &mdash; load settings from a JSON file.</li>
+        <li><code>--token &lt;value&gt;</code> &mdash; override bearer token at runtime.</li>
+        <li><code>--shorturl-base</code> / <code>--paste-base</code> &mdash; switch between prod (<code>linkove.icu</code>) and staging (<code>xp97.icu</code>).</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Short URL Commands</h2>
+      <pre><code>python -m icakad shorturl add slug https://target
+python -m icakad shorturl update slug https://new-target
+python -m icakad shorturl list --output links.json
+python -m icakad shorturl delete slug --quiet
+</code></pre>
+    </section>
+    <section>
+      <h2>Paste Commands</h2>
+      <pre><code>python -m icakad paste create --text "hello"
+python -m icakad paste create --text-file README.md --id doc
+python -m icakad paste get doc --raw --output doc.txt
+python -m icakad paste list --output pastes.json
+</code></pre>
+    </section>
+    <section>
+      <h2>Tips</h2>
+      <ul class="checklist">
+        <li>Combine with shell pipes (<code>... --raw &gt; notes.txt</code>) or set <code>--output</code> for repeatable sharing.</li>
+        <li>Use <code>--quiet</code> when scripting to suppress duplicates in stdout.</li>
+        <li>Running <code>python -m icakad</code> without arguments opens these docs automatically.</li>
+      </ul>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>

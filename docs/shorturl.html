@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Short URL Guide · icakad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Short URL Guide</h1>
+    <p>Manage friendly links powered by the @shorturl Cloudflare worker on <code>linkove.icu</code>.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Python Helpers</h2>
+      <p>Use the high-level functions exported from <code>icakad</code>.</p>
+      <pre><code>from icakad import add_short_link, list_short_links
+
+add_short_link("promo", "https://icaka.eu/promo")
+links = list_short_links()
+print(links["promo"])
+</code></pre>
+      <p>All helpers accept optional parameters:</p>
+      <ul class="checklist">
+        <li><code>base_url</code> &mdash; point to staging (e.g. <code>https://xp97.icu</code>).</li>
+        <li><code>token</code> &mdash; supply bearer tokens when the worker is locked down.</li>
+        <li><code>save_to</code> &mdash; write responses to JSON (useful for sharing with non-technical teammates).</li>
+      </ul>
+    </section>
+    <section>
+      <h2>CLI Recipes</h2>
+      <pre><code># create or update a slug
+python -m icakad shorturl add my-link https://icaka.eu/
+
+# list every slug and save to disk
+python -m icakad shorturl list --output links.json
+
+# delete a slug quietly
+python -m icakad shorturl delete my-link --quiet
+</code></pre>
+      <p>Combine with <code>--config</code> or <code>--shorturl-base</code> to target alternative environments.</p>
+    </section>
+    <section>
+      <h2>Automation Tips</h2>
+      <ul class="checklist">
+        <li>Run scripts from xp97.icu for lowest latency.</li>
+        <li>When working offline, capture <code>list_short_links(save_to="links.json")</code> and share the file.</li>
+        <li>Use branch names like <code>codex/shorturl-refresh</code> when committing updates that touch @shorturl.</li>
+      </ul>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>

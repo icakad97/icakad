@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Paste Guide · icakad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Paste Guide</h1>
+    <p>Store text snippets, logs, and sharable notes through the @paste worker connected to <code>linkove.icu</code>.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Create a Paste</h2>
+      <pre><code>from icakad import create_paste
+
+create_paste(text="Hello xp97!", paste_id="demo-note", ttl=3600)
+</code></pre>
+      <p>Arguments:</p>
+      <ul class="checklist">
+        <li><code>text</code> or <code>text_file</code> &mdash; inline content or a file path.</li>
+        <li><code>paste_id</code> &mdash; optional custom slug.</li>
+        <li><code>ttl</code> &mdash; expire after N seconds (omit to keep forever).</li>
+        <li><code>as_plaintext</code> &mdash; set to <code>True</code> to send <code>text/plain</code> instead of JSON.</li>
+        <li><code>save_to</code> &mdash; store the JSON response so anyone can open it.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>CLI Examples</h2>
+      <pre><code># create from inline text
+python -m icakad paste create --text "hello" --id demo
+
+# create from a file and save the response
+python -m icakad paste create --text-file notes.txt --output paste.json
+
+# fetch raw text and pipe to a file
+python -m icakad paste get demo --raw --output demo.txt
+</code></pre>
+    </section>
+    <section>
+      <h2>Sharing Workflow</h2>
+      <ul class="checklist">
+        <li>Use <code>fetch_paste(..., raw=True, save_to="note.txt")</code> to hand off the plain text.</li>
+        <li>Combine with <code>sys.argv</code> in small scripts to generate release notes for @icakad and @paste simultaneously.</li>
+        <li>Remember that paste metadata is available through <code>list_pastes()</code> for dashboards or audits.</li>
+      </ul>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>
