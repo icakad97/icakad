@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <title>Bookmarklet за изображения · icakad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Safari bookmarklet за събиране на изображения</h1>
+    <p>Форматирана версия на скрипта, който използваш в Safari на iPhone 15, плюс бележки за поддръжка и актуализации.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+      <li><a href="bookmarklet.html">Bookmarklet</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Форматиран код</h2>
+      <p>Кодът по-долу е идентичен с оригиналния bookmarklet, но разреден за по-лесно четене и ревизии.</p>
+      <pre><code>
+javascript:(function () {
+  try {
+    const t = e =&gt; {
+        try {
+          return new URL(e,location.href).href
+        } catch {
+          return null
+        }
+      },
+      n = e =&gt; (e||&quot;&quot;).trim().replace(/^[(&#x27;&quot;“”‘’`&lt;\[]+|[)&#x27;&quot;\]»&gt;，、。.,;:&gt;]+$/g,&quot;&quot;),
+      o = [&quot;avatar&quot;,&quot;thumbs&quot;],
+      r = new Set;
+
+    document.querySelectorAll(&quot;img&quot;).forEach(e =&gt; {
+      const c = e =&gt; {
+        if (e = n(e)) {
+          const c = t(e);
+          if (c) {
+            const e = c.toLowerCase();
+            o.some(t =&gt; e.includes(t)) || r.add(c)
+          }
+        }
+      };
+      e.currentSrc &amp;&amp; c(e.currentSrc),
+      e.src &amp;&amp; c(e.src),
+      [&quot;data-src&quot;,&quot;data-original&quot;,&quot;data-lazy&quot;,&quot;data-url&quot;].forEach(t =&gt; {
+        e.getAttribute(t) &amp;&amp; c(e.getAttribute(t))
+      });
+      const s = e.getAttribute(&quot;srcset&quot;);
+      s &amp;&amp; s.split(&quot;,&quot;).map(e =&gt; e.trim().split(/\s+/)[0]).forEach(c)
+    }),
+    document.querySelectorAll(&quot;*&quot;).forEach(e =&gt; {
+      const c = getComputedStyle(e).getPropertyValue(&quot;background-image&quot;);
+      c &amp;&amp; c.includes(&quot;url(&quot;) &amp;&amp;
+      (c.match(/url\((.*?)\)/g)||[]).forEach(e =&gt; {
+        const c = t(n(e.replace(/^url\([\&quot;&#x27;]?|[\&quot;&#x27;]?\)$/g,&quot;&quot;)));
+        if (c) {
+          const e = c.toLowerCase();
+          o.some(t =&gt; e.includes(t)) || r.add(c)
+        }
+      })
+    });
+
+    if (!r.size) {
+      alert(&quot;❌ Няма намерени подходящи изображения.&quot;);
+      return
+    }
+
+    const c = Array.from(r),
+      s = window.open(&quot;about:blank&quot;,&quot;_blank&quot;),
+      a = `:root{color-scheme:dark}body{margin:16px;background:#0b0b0b;color:#eaeaea;font:16px/1.4 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}h1{margin:0 0 10px}.bar{position:sticky;top:0;background:#0f0f0f;padding:10px;border:1px solid #222;border-radius:10px;margin-bottom:12px}input[type=search]{width:100%;max-width:420px;background:#151515;color:#eaeaea;border:1px solid #333;border-radius:8px;padding:8px}button{background:#222;color:#eaeaea;border:1px solid #333;padding:8px 10px;border-radius:10px;margin-left:8px}ol{padding-left:24px}li{margin:6px 0;word-break:break-all}a{color:#7dd3fc;text-decoration:none}a:hover{text-decoration:underline}.muted{opacity:.8}`,
+      l = e =&gt; e.replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,(e =&gt; ({ &quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;,&#x27;&quot;&#x27;:&quot;&amp;quot;&quot;,&quot;&#x27;&quot;:&quot;&amp;#39;&quot;}[e]))),
+      i = e =&gt; {
+        const t = e.split(&quot;?&quot;,1)[0],
+          n = t.split(&quot;/&quot;).pop() || t;
+        return l(n)
+      },
+      d = `&lt;!DOCTYPE html&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;Линкове към изображения (${c.length})&lt;/title&gt;&lt;style&gt;${a}&lt;/style&gt;&lt;div class=&quot;bar&quot;&gt;&lt;h1&gt;🔗 Линкове към изображения &lt;span class=&quot;muted&quot;&gt;(${c.length})&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;&lt;input id=&quot;search&quot; type=&quot;search&quot; placeholder=&quot;Филтър...&quot;&gt;&lt;button id=&quot;copy&quot;&gt;Copy all&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;ol id=&quot;list&quot;&gt;${c.map((e =&gt; `&lt;li&gt;&lt;a href=&quot;${l(e)}&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;${i(e)}&lt;/a&gt;&lt;/li&gt;`)).join(&quot;\n&quot;)}&lt;/ol&gt;&lt;script&gt;(function(){const list=${JSON.stringify([])};})();&lt;/script&gt;`;
+
+    s.document.open(),
+    s.document.write(
+      d.replace(
+        &#x27;const list=[];&#x27;,
+        &#x27;const list=&#x27; + JSON.stringify(c) + &#x27;;&#x27;
+      ) +
+      `&lt;script&gt;(function(){const ol=document.getElementById(&#x27;list&#x27;),q=document.getElementById(&#x27;search&#x27;),btn=document.getElementById(&#x27;copy&#x27;);function render(f){const a=(f||&#x27;&#x27;).toLowerCase();ol.innerHTML=list.filter(u=&gt;u.toLowerCase().includes(a)).map(u=&gt;{const noQ=u.split(&#x27;?&#x27;,1)[0];const fn=(noQ.split(&#x27;/&#x27;).pop()||noQ).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,m=&gt;({&quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;,&quot;\&quot;&quot;:&quot;&amp;quot;&quot;,&quot;&#x27;&quot;:&quot;&amp;#39;&quot;}[m]));const escU=u.replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,m=&gt;({&quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;,&quot;\&quot;&quot;:&quot;&amp;quot;&quot;,&quot;&#x27;&quot;:&quot;&amp;#39;&quot;}[m]));return &#x27;&lt;li&gt;&lt;a href=\&quot;&#x27;+escU+&#x27;\&quot; target=\&quot;_blank\&quot; rel=\&quot;noopener\&quot;&gt;&#x27;+fn+&#x27;&lt;/a&gt;&lt;/li&gt;&#x27;;}).join(&#x27;\\n&#x27;)}q.addEventListener(&#x27;input&#x27;,()=&gt;render(q.value));render(&#x27;&#x27;);btn.addEventListener(&#x27;click&#x27;,async()=&gt;{const text=list.join(&#x27;\\n&#x27;);try{if(navigator.clipboard&amp;&amp;navigator.clipboard.writeText){await navigator.clipboard.writeText(text);btn.textContent=&#x27;Copied!&#x27;;setTimeout(()=&gt;btn.textContent=&#x27;Copy all&#x27;,1200);}else{const ta=document.createElement(&#x27;textarea&#x27;);ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand(&#x27;copy&#x27;);ta.remove();btn.textContent=&#x27;Copied!&#x27;;setTimeout(()=&gt;btn.textContent=&#x27;Copy all&#x27;,1200);}}catch(e){alert(&#x27;Copy error: &#x27;+e.message);}});})()&lt;\/script&gt;`
+    ),
+    s.document.close()
+  } catch (e) {
+    alert(&quot;Bookmarklet error: &quot; + (e &amp;&amp; e.message ? e.message : e))
+  }
+})();
+      </code></pre>
+    </section>
+    <section>
+      <h2>Какво прави скриптът</h2>
+      <ul class="checklist">
+        <li>Извлича всички <code>&lt;img&gt;</code> източници (включително <code>data-src</code> и <code>srcset</code> атрибути).</li>
+        <li>Открива CSS <code>background-image</code> стойности и добавя директните линкове.</li>
+        <li>Филтрира аватари и миниатюри чрез списъка <code>["avatar", "thumbs"]</code>.</li>
+        <li>Отваря тъмен прозорец с филтър, бързо копиране и списък с валидни URL адреси.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Добавяне в Safari</h2>
+      <ol>
+        <li>Отвори Safari &rarr; Share &rarr; <strong>Add Bookmark</strong> и постави целия код в полето за адрес.</li>
+        <li>Запази отметката в лентата с любими за лесен достъп.</li>
+        <li>При заредена страница с изображения отвори отметката, за да получиш филтруемия списък.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>Поддръжка и идеи</h2>
+      <ul class="checklist">
+        <li>Актуализирай списъка с изключения (<code>o = [&quot;avatar&quot;, &quot;thumbs&quot;]</code>), ако сайтовете използват други префикси.</li>
+        <li>Добави персонален CSS в променливата <code>a</code>, ако искаш различна тема.</li>
+        <li>Когато правиш промени, копирай директно форматирания код в отметката &mdash; логиката остава непроменена.</li>
+      </ul>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>

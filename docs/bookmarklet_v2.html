@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <title>Bookmarklet за изображения · версия 2 · icakad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Safari bookmarklet за събиране на изображения · версия 2</h1>
+    <p>Актуализирана вариация на оригиналния скрипт с допълнителни филтри за OnlyFans снимки и идентичен формат за лесно копиране.</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="shorturl.html">Short URLs</a></li>
+      <li><a href="paste.html">Pastes</a></li>
+      <li><a href="cli.html">Command Line</a></li>
+      <li><a href="config.html">Configuration</a></li>
+      <li><a href="bookmarklet.html">Bookmarklet v1</a></li>
+      <li><a href="bookmarklet_v2.html" aria-current="page">Bookmarklet v2</a></li>
+    </ul>
+  </nav>
+  <main>
+    <section>
+      <h2>Форматиран код</h2>
+      <p>Новият код е разреден по същия начин като първата версия, но включва проверките за размер на OnlyFans файловете.</p>
+      <pre><code>
+javascript:(function () {
+  try {
+    const t = e =&gt; {
+        try {
+          return new URL(e,location.href).href
+        } catch {
+          return null
+        }
+      },
+      n = e =&gt; (e||&quot;&quot;).trim().replace(/^[(&#x27;&quot;“”‘’`&lt;\[]+|[)&#x27;&quot;\]»&gt;，、。.,;:&gt;]+$/g,&quot;&quot;),
+      o = [&quot;avatar&quot;,&quot;thumbs&quot;],
+      r = new Set,
+      u = e =&gt; {
+        if (!e) {
+          return false
+        }
+        const i = e.toLowerCase();
+        if (!i.includes(&quot;onlyfans&quot;)) {
+          return true
+        }
+        const r = (() =&gt; {
+          try {
+            const t = new URL(e).pathname.split(&quot;/&quot;).pop()||&quot;&quot;;
+            const n = t.match(/^(\d+)[xх](\d+)_/i);
+            if (n) {
+              return { width: parseInt(n[1],10), height: parseInt(n[2],10) }
+            }
+          } catch {}
+          return null
+        })();
+        if (!r) {
+          return false
+        }
+        const { width: t, height: n } = r,
+          s = t + n;
+        if (t &lt; 300 || n &lt; 300) {
+          return false
+        }
+        if (s &lt; 900) {
+          return false
+        }
+        if (t &lt; 600 &amp;&amp; n &lt; 600) {
+          return false
+        }
+        return true
+      };
+
+    document.querySelectorAll(&quot;img&quot;).forEach(e =&gt; {
+      const c = e =&gt; {
+        if (e = n(e)) {
+          const c = t(e);
+          if (c) {
+            const e = c.toLowerCase();
+            o.some(t =&gt; e.includes(t)) || r.add(c)
+          }
+        }
+      };
+      e.currentSrc &amp;&amp; c(e.currentSrc),
+      e.src &amp;&amp; c(e.src),
+      [&quot;data-src&quot;,&quot;data-original&quot;,&quot;data-lazy&quot;,&quot;data-url&quot;].forEach(t =&gt; {
+        e.getAttribute(t) &amp;&amp; c(e.getAttribute(t))
+      });
+      const s = e.getAttribute(&quot;srcset&quot;);
+      s &amp;&amp; s.split(&quot;,&quot;).map(e =&gt; e.trim().split(/\s+/)[0]).forEach(c)
+    }),
+    document.querySelectorAll(&quot;*&quot;).forEach(e =&gt; {
+      const c = getComputedStyle(e).getPropertyValue(&quot;background-image&quot;);
+      c &amp;&amp; c.includes(&quot;url(&quot;) &amp;&amp;
+      (c.match(/url\((.*?)\)/g)||[]).forEach(e =&gt; {
+        const c = t(n(e.replace(/^url\([\&quot;&#x27;]?|[\&quot;&#x27;]?\)$/g,&quot;&quot;)));
+        if (c) {
+          const e = c.toLowerCase();
+          o.some(t =&gt; e.includes(t)) || r.add(c)
+        }
+      })
+    });
+
+    const c = Array.from(r).filter(u);
+    if (!c.length) {
+      alert(&quot;❌ Няма намерени подходящи изображения.&quot;);
+      return
+    }
+
+    const s = window.open(&quot;about:blank&quot;,&quot;_blank&quot;),
+      a = `:root{color-scheme:dark}body{margin:16px;background:#0b0b0b;color:#eaeaea;font:16px/1.4 -apple-system,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}h1{margin:0 0 10px}.bar{position:sticky;top:0;background:#0f0f0f;padding:10px;border:1px solid #222;border-radius:10px;margin-bottom:12px}input[type=search]{width:100%;max-width:420px;background:#151515;color:#eaeaea;border:1px solid #333;border-radius:8px;padding:8px}button{background:#222;color:#eaeaea;border:1px solid #333;padding:8px 10px;border-radius:10px;margin-left:8px}ol{padding-left:24px}li{margin:6px 0;word-break:break-all}a{color:#7dd3fc;text-decoration:none}a:hover{text-decoration:underline}.muted{opacity:.8}`,
+      l = e =&gt; e.replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,(e =&gt; ({ &quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;,&#x27;&quot;&#x27;:&quot;&amp;quot;&quot;,&quot;&#x27;&quot;:&quot;&amp;#39;&quot;}[e]))),
+      i = e =&gt; {
+        const t = e.split(&quot;?&quot;,1)[0],
+          n = t.split(&quot;/&quot;).pop() || t;
+        return l(n)
+      },
+      d = `&lt;!DOCTYPE html&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;title&gt;Линкове към изображения (${c.length})&lt;/title&gt;&lt;style&gt;${a}&lt;/style&gt;&lt;div class=&quot;bar&quot;&gt;&lt;h1&gt;🔗 Линкове към изображения &lt;span class=&quot;muted&quot;&gt;(${c.length})&lt;/span&gt;&lt;/h1&gt;&lt;div&gt;&lt;input id=&quot;search&quot; type=&quot;search&quot; placeholder=&quot;Филтър...&quot;&gt;&lt;button id=&quot;copy&quot;&gt;Copy all&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;&lt;ol id=&quot;list&quot;&gt;${c.map((e =&gt; `&lt;li&gt;&lt;a href=&quot;${l(e)}&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;${i(e)}&lt;/a&gt;&lt;/li&gt;`)).join(&quot;\n&quot;)}&lt;/ol&gt;&lt;script&gt;(function(){const list=${JSON.stringify([])};})();&lt;/script&gt;`;
+
+    s.document.open(),
+    s.document.write(
+      d.replace(
+        &#x27;const list=[];&#x27;,
+        &#x27;const list=&#x27; + JSON.stringify(c) + &#x27;;&#x27;
+      ) +
+      `&lt;script&gt;(function(){const ol=document.getElementById(&#x27;list&#x27;),q=document.getElementById(&#x27;search&#x27;),btn=document.getElementById(&#x27;copy&#x27;);function render(f){const a=(f||&#x27;&#x27;).toLowerCase();ol.innerHTML=list.filter(u=&gt;u.toLowerCase().includes(a)).map(u=&gt;{const noQ=u.split(&#x27;?&#x27;,1)[0];const fn=(noQ.split(&#x27;/&#x27;).pop()||noQ).replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,m=&gt;({&quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;,&quot;\&quot;&quot;:&quot;&amp;quot;&quot;,&quot;&#x27;&quot;:&quot;&amp;#39;&quot;}[m]));const escU=u.replace(/[&amp;&lt;&gt;&quot;&#x27;]/g,m=&gt;({&quot;&amp;&quot;:&quot;&amp;amp;&quot;,&quot;&lt;&quot;:&quot;&amp;lt;&quot;,&quot;&gt;&quot;:&quot;&amp;gt;&quot;,&quot;\&quot;&quot;:&quot;&amp;quot;&quot;,&quot;&#x27;&quot;:&quot;&amp;#39;&quot;}[m]));return &#x27;&lt;li&gt;&lt;a href=\&quot;&#x27;+escU+&#x27;\&quot; target=\&quot;_blank\&quot; rel=\&quot;noopener\&quot;&gt;&#x27;+fn+&#x27;&lt;/a&gt;&lt;/li&gt;&#x27;;}).join(&#x27;\\n&#x27;)}q.addEventListener(&#x27;input&#x27;,()=&gt;render(q.value));render(&#x27;&#x27;);btn.addEventListener(&#x27;click&#x27;,async()=&gt;{const text=list.join(&#x27;\\n&#x27;);try{if(navigator.clipboard&amp;&amp;navigator.clipboard.writeText){await navigator.clipboard.writeText(text);btn.textContent=&#x27;Copied!&#x27;;setTimeout(()=&gt;btn.textContent=&#x27;Copy all&#x27;,1200);}else{const ta=document.createElement(&#x27;textarea&#x27;);ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand(&#x27;copy&#x27;);ta.remove();btn.textContent=&#x27;Copied!&#x27;;setTimeout(()=&gt;btn.textContent=&#x27;Copy all&#x27;,1200);}}catch(e){alert(&#x27;Copy error: &#x27;+e.message);}});})()&lt;\/script&gt;`
+    ),
+    s.document.close()
+  } catch (e) {
+    alert(&quot;Bookmarklet error: &quot; + (e &amp;&amp; e.message ? e.message : e))
+  }
+})();
+      </code></pre>
+    </section>
+    <section>
+      <h2>Какво е новото</h2>
+      <ul class="checklist">
+        <li>Запазена е оригиналната логика за обход на <code>&lt;img&gt;</code> и CSS фон изображения.</li>
+        <li>Добавена е функция, която проверява OnlyFans линковете по шаблона за резолюция в името.</li>
+        <li>Разрешават се само снимки с ширина и височина поне 300px, сбор на страните минимум 900px и поне една страна &ge; 600px.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Добавяне в Safari</h2>
+      <ol>
+        <li>Отвори Safari &rarr; Share &rarr; <strong>Add Bookmark</strong> и постави целия код от тази версия.</li>
+        <li>Съхрани отметката под различно име, за да различаваш версия 1 и версия 2.</li>
+        <li>На OnlyFans страници използвай версия 2, за да получиш списък само с изображения, които покриват размерните изисквания.</li>
+      </ol>
+    </section>
+    <section>
+      <h2>Поддръжка и идеи</h2>
+      <ul class="checklist">
+        <li>Ако OnlyFans промени формата на имената, актуализирай регулярния израз в новата функция.</li>
+        <li>Можеш да добавяш още домейни в проверката <code>o = [&quot;avatar&quot;, &quot;thumbs&quot;]</code>, ако се появят нови миниатюри.</li>
+        <li>Наслади се на същия тъмен интерфейс с търсене и бързо копиране, без да показваш малките изображения.</li>
+      </ul>
+    </section>
+  </main>
+  <footer>Maintained by the icakad network · Server: xp97.icu</footer>
+</body>
+</html>
