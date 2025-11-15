@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 from .ai import AI
-from .common import resolve_text_input, write_json, write_text
+from .common import print_json, resolve_text_input, write_json, write_text
 from .config import Settings, load_settings
 from .paste import PasteClient
 from .shorturl import ShortURLClient
@@ -15,11 +15,14 @@ __all__ = [
     "AI",
     "Settings",
     "load_settings",
+    "add_short_link",
     "list_short_links",
     "update_short_link",
     "delete_short_link",
+    "list_pastes",
     "create_paste",
     "fetch_paste",
+    "print_json",
 ]
 
 __version__ = "0.1.3"
@@ -59,16 +62,34 @@ def _paste_client_from_settings(
 
 
 # -------------------------------------------------------------- short links
+def add_short_link(
+    slug: str,
+    url: str,
+    *,
+    save_to: Optional[Union[str, Path]] = None,
+    settings: Optional[Settings] = None,
+    **overrides: Any,
+) -> Dict[str, Any]:
+    client = _client_from_settings(settings=settings, **overrides)
+    result = client.add_link(slug, url)
+    if save_to:
+        write_json(result, save_to)
+    return result
+
+
 def list_short_links(
     *,
     save_to: Optional[Union[str, Path]] = None,
     settings: Optional[Settings] = None,
+    print_output: bool = True,
     **overrides: Any,
 ) -> Dict[str, str]:
     client = _client_from_settings(settings=settings, **overrides)
     links = client.list_links()
     if save_to:
         write_json(links, save_to)
+    if print_output:
+        print_json(links)
     return links
 
 
@@ -76,21 +97,29 @@ def update_short_link(
     slug: str,
     url: str,
     *,
+    save_to: Optional[Union[str, Path]] = None,
     settings: Optional[Settings] = None,
     **overrides: Any,
 ) -> Dict[str, Any]:
     client = _client_from_settings(settings=settings, **overrides)
-    return client.edit_link(slug, url)
+    result = client.edit_link(slug, url)
+    if save_to:
+        write_json(result, save_to)
+    return result
 
 
 def delete_short_link(
     slug: str,
     *,
+    save_to: Optional[Union[str, Path]] = None,
     settings: Optional[Settings] = None,
     **overrides: Any,
 ) -> Dict[str, Any]:
     client = _client_from_settings(settings=settings, **overrides)
-    return client.delete_link(slug)
+    result = client.delete_link(slug)
+    if save_to:
+        write_json(result, save_to)
+    return result
 
 
 # ------------------------------------------------------------------- pastes
@@ -115,6 +144,22 @@ def create_paste(
     )
     if save_to:
         write_json(result, save_to)
+    return result
+
+
+def list_pastes(
+    *,
+    save_to: Optional[Union[str, Path]] = None,
+    settings: Optional[Settings] = None,
+    print_output: bool = True,
+    **overrides: Any,
+) -> Dict[str, Any]:
+    client = _paste_client_from_settings(settings=settings, **overrides)
+    result = client.list_pastes()
+    if save_to:
+        write_json(result, save_to)
+    if print_output:
+        print_json(result)
     return result
 
 
