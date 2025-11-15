@@ -10,7 +10,14 @@ import requests
 from icakad.config import load_settings
 from icakad.paste import PasteClient
 from icakad.shorturl import ShortURLClient
-from icakad import create_paste, fetch_paste, list_short_links, update_short_link, delete_short_link
+from icakad import (
+    AI,
+    create_paste,
+    delete_short_link,
+    fetch_paste,
+    list_short_links,
+    update_short_link,
+)
 
 
 def make_response(*, json_data=None, text="", status=200):
@@ -151,6 +158,23 @@ class HighLevelHelpersTests(unittest.TestCase):
             delete = delete_short_link("demo")
         self.assertTrue(update["ok"])
         self.assertTrue(delete["ok"])
+
+
+class AITests(unittest.TestCase):
+    def test_ask_posts_prompt_to_worker(self):
+        with patch("icakad.ai.requests.post") as mocked_post:
+            mocked_post.return_value = make_response(
+                json_data={"response": "Здрасти"}
+            )
+            reply = AI.ask("Hello from Pythonista")
+
+        self.assertEqual(reply, "Здрасти")
+        mocked_post.assert_called_with(
+            "https://llama.icakad.workers.dev/",
+            json={"messages": [{"role": "user", "content": "Hello from Pythonista"}]},
+            headers={"Content-Type": "application/json"},
+            timeout=20.0,
+        )
 
 
 if __name__ == "__main__":
