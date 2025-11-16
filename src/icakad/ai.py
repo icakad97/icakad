@@ -9,6 +9,8 @@ import requests
 
 Message = Mapping[str, str]
 
+__all__ = ["AI", "ask"]
+
 
 class AI:
     """Обвивка за изпращане на съобщения към LLM през HTTP."""
@@ -68,3 +70,22 @@ class AI:
         if not isinstance(prompt, str) or not prompt.strip():
             raise ValueError("prompt must be a non-empty string")
         return [{"role": "user", "content": prompt}]
+
+
+def ask(
+    prompt: str,
+    *,
+    messages: Optional[Iterable[Message]] = None,
+    url: Optional[str] = None,
+    timeout: Optional[float] = None,
+    session: Optional[requests.sessions.Session] = None,
+) -> str:
+    """Улеснена обвивка за :meth:`AI.ask` достъпна на ниво модул."""
+
+    return AI.ask(
+        prompt,
+        messages=messages,
+        url=url,
+        timeout=timeout,
+        session=session,
+    )
