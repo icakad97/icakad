@@ -7,6 +7,7 @@ from contextlib import redirect_stdout
 from io import StringIO
 from typing import Any, Dict, List
 
+from icakad import ai as ai_module
 from icakad.ai import AI
 
 
@@ -65,6 +66,15 @@ class AIConversationTests(unittest.TestCase):
             self.assertIn("messages", recorded["payload"])
             self.assertEqual(recorded["headers"], {"Content-Type": "application/json"})
             self.assertEqual(recorded["timeout"], 20.0)
+
+    def test_module_level_ask_is_available(self) -> None:
+        session = _DummySession()
+        reply = ai_module.ask("Здравей", session=session)
+
+        self.assertIsInstance(reply, str)
+        self.assertEqual(len(session.posts), 1)
+        recorded = session.posts[0]
+        self.assertEqual(recorded["payload"]["messages"], [{"role": "user", "content": "Здравей"}])
 
 
 if __name__ == "__main__":
