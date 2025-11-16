@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
+from ._version import __version__
 from .ai import AI
 from .common import print_json, resolve_text_input, write_json, write_text
 from .config import Settings, load_settings
@@ -24,9 +25,6 @@ __all__ = [
     "fetch_paste",
     "print_json",
 ]
-
-__version__ = "0.1.3"
-
 
 # ----------------------------------------------------------------- factories
 def _client_from_settings(
