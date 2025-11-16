@@ -2,8 +2,17 @@ LICENSE
 README.md
 pyproject.toml
 src/icakad/__init__.py
+src/icakad/__main__.py
+src/icakad/ai.py
+src/icakad/cli.py
+src/icakad/config.py
+src/icakad/paste.py
 src/icakad/shorturl.py
 src/icakad.egg-info/PKG-INFO
 src/icakad.egg-info/SOURCES.txt
 src/icakad.egg-info/dependency_links.txt
+src/icakad.egg-info/requires.txt
 src/icakad.egg-info/top_level.txt
+src/icakad/common/__init__.py
+tests/test_ai_conversation.py
+tests/test_icakad.py

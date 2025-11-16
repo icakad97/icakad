@@ -124,7 +124,7 @@ class HighLevelHelpersTests(unittest.TestCase):
         fake_client.list_links.return_value = {"demo": "https://example.com"}
         with tempfile.TemporaryDirectory() as tmp, patch("icakad._client_from_settings", return_value=fake_client):
             output = Path(tmp) / "links.json"
-            data = list_short_links(save_to=output)
+            data = list_short_links(save_to=output, print_output=False)
             self.assertEqual(data, {"demo": "https://example.com"})
             stored = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(stored, data)
